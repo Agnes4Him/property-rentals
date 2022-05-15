@@ -10,6 +10,7 @@ class User {
         this.phone = phone
         this.address = address
         this.is_admin = is_admin
+    
     }
 
     static signupUser(newUser, result) {
@@ -40,13 +41,14 @@ class User {
                     console.log("Sign up successful", {...newUser})
                     result(null, {id:res.insertId, ...newUser})
                 })
+
             })
             
         })
     }
 
-    static loginUser(user, result) {
-        db.query('SELECT * FROM users WHERE email=?', [user.email], (err, res) => {
+    static loginUser(email, password, result) {
+        db.query('SELECT * FROM users WHERE email=?', [email], (err, res) => {
             if (err) {
                 console.log(err)
                 result(err, null)
@@ -61,7 +63,7 @@ class User {
 
             if (res.length) {
 
-                bcrypt.compare(user.password, res.password, (response) => {
+                bcrypt.compare(password, res.password, (response) => {
 
                     if (response === false) {
                         console.log("Your password is incorrect")
@@ -77,6 +79,59 @@ class User {
     
 }
 
-    
+class UserUpdate {
+    constructor(email, new_password, id) {
+        this.email = email
+        this.new_password = new_password
+        this.id = id
+    }
 
-module.exports = User;
+    static updateUser(email, new_password, result) {
+        db.query('SELECT * FROM users WHERE email=?', [email], (err, res) => {
+            if (err) {
+                console.log(err)
+                result(err, null)
+                return;
+            }else if (!res.length) {
+                console.log("That user does not exist")
+                result({"type" : "no_user"}, null)
+                return;
+            }else {
+                bcrypt.hash(new_password, 5, (err, updatedHash) => {
+                    if (err) {
+                        console.log(err)
+                        result(err, null)
+                        return;
+                    }else {
+                        db.query('UPDATE users SET password=?', [updatedHash], (err, res) => {
+                            if (err) {
+                            console.log(err)
+                            result(err, null)
+                            return;
+                        }
+                        console.log( "Password reset successful!")
+                        result(null, {...res})
+                    })
+                    }
+                })
+                
+           }
+        })
+    }
+
+    static deleteUser(id, result) {
+        db.query('DELETE FROM users WHERE id=?', [id], (err, res) => {
+            if (err) {
+                console.log(err)
+                result(err, null)
+                return;
+            }else {
+            console.log("User successfully deleted")
+            result(null, id)
+            }
+        })
+    }
+}
+
+
+module.exports = {User, UserUpdate};
