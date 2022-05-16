@@ -9,5 +9,3 @@ router.put('/api/v1/auth/updateuser', verifyToken, userController.resetPassword)
 router.delete('/api/v1/auth/deleteuser', verifyToken, userController.deleteuser);
 
 module.exports = router;
-
-//change router to userRouter

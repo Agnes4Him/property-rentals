@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
 const {User, UserUpdate} = require('../models/user.model');
 const dotenv = require('dotenv');
-const upload = require('../config/multer');
-const cloudinary = require('../config/cloudinary');
 
 dotenv.config()
 
