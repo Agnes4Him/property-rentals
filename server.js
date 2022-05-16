@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
     //console.log(req);
-    res.send({"Message" : "Welcome to ApexHauz! A home for property sales and rentals."})
+    res.send({"Message" : "Welcome to ApexHauz! A home of property sales and rentals."})
 })
 
 app.use(router)
