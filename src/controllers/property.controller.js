@@ -25,14 +25,18 @@ exports.addProperty = (req, res) => {
                         console.log(err)
                         res.status(500).send({"Message":"Cannot upload image at the moment. Try again later"})
                     }else {
-                        //console.log(result)
+                        console.log(result)
                         const image = result.secure_url;
                         //console.log(image)
-                        const property = new Property(owner, status, price, state, city, address, type, image)
+                        const image_id = result.public_id
+                        const property = new Property(owner, status, price, state, city, address, type, image, image_id)
                         Property.createAd(property, (err, data) => {
                             if (err) {
                                 if (err.type == "property_exist") {
-                                    res.status(400).send({"Message":"That ad already exist"})
+                                    cloudinary.uploader.destroy(image_id, (error, result) => {
+                                        res.status(400).send({"Message":"That ad already exist"})
+                                    });
+                                    
                                 }else {
                                     res.status(500).send({"Message": err.message})
                                 }

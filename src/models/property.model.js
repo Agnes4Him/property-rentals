@@ -1,7 +1,7 @@
 const db = require('../config/db.config.js');
 
 class Property {
-    constructor(owner, status, price, state, city, address, type, image) {
+    constructor(owner, status, price, state, city, address, type, image, image_id) {
         this.owner = owner
         this.status = status
         this.price = price
@@ -10,6 +10,7 @@ class Property {
         this.address = address
         this.type = type
         this.image = image
+        this.image_id = image_id
 
     }
 
@@ -24,7 +25,7 @@ class Property {
                 result({"type":"property_exist"}, null)
                 return;
             }else {
-                db.query('INSERT INTO property (owner, status, price, state, city, address, type, image) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [newProperty.owner, newProperty.status, newProperty.price, newProperty.state, newProperty.city, newProperty.address, newProperty.type, newProperty.image], (err, res) => {
+                db.query('INSERT INTO property (owner, status, price, state, city, address, type, image, image_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [newProperty.owner, newProperty.status, newProperty.price, newProperty.state, newProperty.city, newProperty.address, newProperty.type, newProperty.image, newProperty.image_id], (err, res) => {
                     if (err) {
                         console.log(err)
                         result(err, null)
