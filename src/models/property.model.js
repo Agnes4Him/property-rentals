@@ -10,27 +10,28 @@ class Property {
         this.address = address
         this.type = type
         this.image = image
+
     }
 
     static createAd(newProperty, result) {
-        db.query('SELECT * FROM property WHERE owner=? AND image=?', [newProperty.owner, newProperty.image], (err, res) => {
+        db.query('SELECT * FROM property WHERE owner=? AND type=?', [newProperty.owner, newProperty.type], (err, res) => {
             if (err) {
                 console.log(err)
                 result(err, null)
                 return;
-            }else if (res.length) {
+            }else if (res.length > 0) {
                 console.log("That property already exists")
                 result({"type":"property_exist"}, null)
                 return;
             }else {
-                db.query('INSERT INTO property (owner, status, price, city, address, type, image, created_on) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [newProperty.owner, newProperty.status, newProperty.price, newProperty.city, newProperty.address, newProperty.type, newProperty.image, now()], (err, res) => {
+                db.query('INSERT INTO property (owner, status, price, state, city, address, type, image) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [newProperty.owner, newProperty.status, newProperty.price, newProperty.state, newProperty.city, newProperty.address, newProperty.type, newProperty.image], (err, res) => {
                     if (err) {
                         console.log(err)
                         result(err, null)
                         return;
                     }else {
                     console.log("Ad successfully created", {...newProperty})
-                    result(null, {id:res.insertId, ...newUser})
+                    result(null, {id:res.insertId, ...newProperty})
                     }
                 })
             }
