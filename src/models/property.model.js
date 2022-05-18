@@ -39,8 +39,8 @@ class Property {
         })
     }
 
-    static markSold(owner, image_id, status, result) {
-        db.query('SELECT * FROM property WHERE owner = ? AND image_id = ?', [owner, image_id], (err, res) => {
+    static markSold(owner, id, status, result) {
+        db.query('SELECT * FROM property WHERE owner = ? AND id = ?', [owner, id], (err, res) => {
             if (err) {
                 console.log(err)
                 result(err, null)
@@ -50,7 +50,7 @@ class Property {
                 result({"type": "no_property"})
                 return
             }else {
-                db.query('UPDATE property SET status = ? WHERE owner = ? AND image_id = ?', [status, owner, image_id], (err, res) => {
+                db.query('UPDATE property SET status = ? WHERE owner = ? AND id = ?', [status, owner, id], (err, res) => {
                     if ( err) {
                         console.log(err)
                         result(err, null)
@@ -85,6 +85,30 @@ class Property {
                 })        
                 
             }
+        })
+    }
+
+    static viewAllProps(result) {
+        db.query('SELECT * FROM property', (err, res) => {
+            if (err) {
+                console.log(err)
+                result(err, null)
+                return;
+            }
+            console.log("Properties:", res)
+            result(null, {"Number of properties":res.length, ...res})
+        })
+    }
+
+    static viewOneProp(id, result) {
+        db.query('SELECT * FROM property WHERE id = ?', [id], (err, res) => {
+            if (err) {
+                console.log(err)
+                result(err, null)
+                return;
+            }
+            console.log("Property:", res)
+            result(null, res)
         })
     }
 }

@@ -56,7 +56,7 @@ exports.addProperty = (req, res) => {
 }
 
 exports.updateSold = (req, res) => {
-    const image_id = req.params.image_id;
+    const id = req.params.id;
     const status = req.query.status;  
     if (!status) {
         res.status(400).send({"Message" : "Please include the status of your ad"})
@@ -64,10 +64,10 @@ exports.updateSold = (req, res) => {
         jwt.verify(req.token, process.env.JWT_KEY, (err, authData) => {
             if (err) {
                 console.log(err)
-                req.status(400).send({"Message":"Please login to updateyour ad"})
+                req.status(400).send({"Message":"Please login to update your ad"})
             }else {
                 const owner = authData.user['id']
-                Property.markSold(owner, image_id, status, (err, data) => {
+                Property.markSold(owner, id, status, (err, data) => {
                     if (err) {
                         if (err.type == "no_property") {
                             res.status(400).send({"Message" : "That property does not exist!"})
@@ -75,13 +75,7 @@ exports.updateSold = (req, res) => {
                             res.status(500).send({"Message" : err.message})
                         }
                     }else {
-                        cloudinary.uploader.destroy(image_id, (error, result) => {
-                            if (error) {
-                                console.log(error)
-                                res.status(500).send({"Message" : "An error has occurred. Please try again"})
-                            }
                             res.send({"status" : "success", "message" : "Property successfully marked as sold"})
-                        })
                     }
                 })
             }
@@ -117,4 +111,39 @@ exports.deleteProperty = (req, res) => {
             })
         }
     })      
+}
+
+exports.viewAll = (req, res) => {
+    jwt.verify(req.token, process.env.JWT_KEY, (err, authData) => {
+        if (err) {
+            console.log(err)
+            req.status(400).send({"Message":"Please login to view ads"})
+        }else {
+            const owner = authData.user['id']
+            Property.viewAllProps((err, data) => {
+                if (err) {
+                    res.status(500).send({"Message" : "An error occurred. Try again later"})
+                }
+                    res.send({"status" : "success", "data" : data})
+            })
+        }
+    })         
+}
+
+exports.viewOne = (req, res) => {
+    const id = req.params.id
+    jwt.verify(req.token, process.env.JWT_KEY, (err, authData) => {
+        if (err) {
+            console.log(err)
+            req.status(400).send({"Message":"Please login to view ad"})
+        }else {
+            const owner = authData.user['id']
+            Property.viewOneProp(id, (err, data) => {
+                if (err) {
+                    res.status(500).send({"Message" : "An error occurred. Try again later"})
+                }
+                    res.send({"status" : "success", "data" : data})
+            })
+        }
+    })         
 }
