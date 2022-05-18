@@ -38,6 +38,30 @@ class Property {
             }
         })
     }
+
+    static markSold(owner, id, status, result) {
+        db.query('SELECT * FROM property WHERE owner = ? AND id = ?', [owner, id], (err, res) => {
+            if (err) {
+                console.log(err)
+                result(err, null)
+                return;
+            }else if (res.length == 0) {
+                console.log("That property does not exist")
+                result({"type": "no_property"})
+                return
+            }else {
+                db.query('UPDATE property SET status = ? WHERE owner = ? AND id = ?', [status, owner, id], (err, res) => {
+                    if ( err) {
+                        console.log(err)
+                        result(err, null)
+                        return;
+                    }
+                    console.log("Ad successfully marked as sold")
+                    result(null, res.affectedRows)
+                })          
+            }
+        })
+    }
 }
 
 module.exports = Property;
