@@ -25,7 +25,7 @@ exports.addProperty = (req, res) => {
                         console.log(err)
                         res.status(500).send({"Message":"Cannot upload image at the moment. Try again later"})
                     }else {
-                        console.log(result)
+                        //console.log(result)
                         const image = result.secure_url;
                         //console.log(image)
                         const image_id = result.public_id
@@ -49,5 +49,33 @@ exports.addProperty = (req, res) => {
 
             }
         })
+    }
+}
+
+exports.updateSold = (req, res) => {
+    const id = req.params.id;
+    const status = req.query.status;  
+    if (!status) {
+        res.status(400).send({"Message" : "Please include the status of your ad"})
+    }else {
+        jwt.verify(req.token, process.env.JWT_KEY, (err, authData) => {
+            if (err) {
+                console.log(err)
+                req.status(400).send({"Message":"Please login to updateyour ad"})
+            }else {
+                const owner = authData.user['id']
+                Property.markSold(owner, id, status, (err, data) => {
+                    if (err) {
+                        if (err.type == "no_property") {
+                            res.status(400).send({"Message" : "That property does not exist!"})
+                        }else {
+                            res.status(500).send({"Message" : err.message})
+                        }
+                    }else {
+                        res.send({"status" : "success", "message" : "Property successfully marked as sold"})
+                    }
+                })
+            }
+        })     
     }
 }
