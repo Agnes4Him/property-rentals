@@ -34,6 +34,9 @@ exports.addProperty = (req, res) => {
                             if (err) {
                                 if (err.type == "property_exist") {
                                     cloudinary.uploader.destroy(image_id, (error, result) => {
+                                        if (error) {
+                                            res.status(500).send({"Message" : "An error has occured, please try again!"})
+                                        }
                                         res.status(400).send({"Message":"That ad already exist"})
                                     });
                                     
@@ -53,7 +56,7 @@ exports.addProperty = (req, res) => {
 }
 
 exports.updateSold = (req, res) => {
-    const id = req.params.id;
+    const image_id = req.params.image_id;
     const status = req.query.status;  
     if (!status) {
         res.status(400).send({"Message" : "Please include the status of your ad"})
@@ -64,7 +67,7 @@ exports.updateSold = (req, res) => {
                 req.status(400).send({"Message":"Please login to updateyour ad"})
             }else {
                 const owner = authData.user['id']
-                Property.markSold(owner, id, status, (err, data) => {
+                Property.markSold(owner, image_id, status, (err, data) => {
                     if (err) {
                         if (err.type == "no_property") {
                             res.status(400).send({"Message" : "That property does not exist!"})
@@ -72,10 +75,46 @@ exports.updateSold = (req, res) => {
                             res.status(500).send({"Message" : err.message})
                         }
                     }else {
-                        res.send({"status" : "success", "message" : "Property successfully marked as sold"})
+                        cloudinary.uploader.destroy(image_id, (error, result) => {
+                            if (error) {
+                                console.log(error)
+                                res.status(500).send({"Message" : "An error has occurred. Please try again"})
+                            }
+                            res.send({"status" : "success", "message" : "Property successfully marked as sold"})
+                        })
                     }
                 })
             }
         })     
     }
+}
+
+exports.deleteProperty = (req, res) => { 
+    const image_id = req.params.image_id
+    jwt.verify(req.token, process.env.JWT_KEY, (err, authData) => {
+        if (err) {
+            console.log(err)
+            req.status(400).send({"Message":"Please login to delete ad"})
+        }else {
+            const owner = authData.user['id']
+            Property.deleteProp(owner, image_id, (err, data) => {
+                if (err) {
+                    if (err.type == "no_prop") {
+                        res.status(400).send({"Message" : "That property does not exist!"})
+                    }else {
+                        res.status(500).send({"Message" : err.message})
+                    }
+                }else {
+                    cloudinary.uploader.destroy(image_id, (error, result) => {
+                        if (error) {
+                            console.log(error)
+                            res.status(500).send({"Message" : "An error has occurred. Please try again"})
+                        }
+                        res.send({"status" : "success", "message" : "Ad successfully deleted"})
+                    })
+                    
+                }
+            })
+        }
+    })      
 }
