@@ -94,6 +94,10 @@ class Property {
                 console.log(err)
                 result(err, null)
                 return;
+            }else if (res.length == 0) {
+                console.log("No ads to display") 
+                result({"type" : "no_ads"}, null)
+                return;
             }
             console.log("Properties:", res)
             result(null, {"Number of properties":res.length, ...res})
@@ -105,6 +109,26 @@ class Property {
             if (err) {
                 console.log(err)
                 result(err, null)
+                return;
+            }else if (res.length == 0) {
+                console.log("That ad does not exist any longer")
+                result({"type" : "no_ad"}, null)
+                return;
+            }
+            console.log("Property:", res)
+            result(null, res)
+        })
+    }
+
+    static viewPropType(type, result) {
+        db.query('SELECT * FROM property WHERE type = ?', [type], (err, res) => {
+            if (err) {
+                console.log(err)
+                result(err, null)
+                return;
+            }else if (res.length == 0) {
+                console.log("No property type")
+                result({"type" : "no_type"})
                 return;
             }
             console.log("Property:", res)
