@@ -119,10 +119,13 @@ exports.viewAll = (req, res) => {
             console.log(err)
             req.status(400).send({"Message":"Please login to view ads"})
         }else {
-            const owner = authData.user['id']
             Property.viewAllProps((err, data) => {
                 if (err) {
-                    res.status(500).send({"Message" : "An error occurred. Try again later"})
+                    if (err.type == "no_ads") {
+                        res.status(500).send({"Message" : "Sorry, no ads to display"})
+                    }else {
+                        res.status(500).send(err.message)
+                    }
                 }
                     res.send({"status" : "success", "data" : data})
             })
@@ -137,13 +140,41 @@ exports.viewOne = (req, res) => {
             console.log(err)
             req.status(400).send({"Message":"Please login to view ad"})
         }else {
-            const owner = authData.user['id']
             Property.viewOneProp(id, (err, data) => {
                 if (err) {
-                    res.status(500).send({"Message" : "An error occurred. Try again later"})
+                    if (err.type == "no_ad") {
+                        res.status(500).send({"Message" : "That ad no longer exist"})
+                    }else {
+                        res.status(500).send(err.message)
+                    }
                 }
                     res.send({"status" : "success", "data" : data})
             })
         }
     })         
+}
+
+exports.viewType = (req, res) => {
+    const type = req.query.type;
+    if (!type) {
+        res.status(400).send({"Message" : "Enter property type"})
+    }else {
+        jwt.verify(req.token, process.env.JWT_KEY, (err, authData) => {
+            if (err) {
+                console.log(err)
+                req.status(400).send({"Message":"Please login to view ads"})
+            }else {
+                Property.viewPropType(type, (err, data) => {
+                    if (err) {
+                        if (err.type == "no_type") {
+                            res.status(500).send({"Message" : "No ads with that property type"})
+                        }else {
+                            res.status(500).send(err.message)
+                        }
+                    }
+                        res.send({"status" : "success", "data" : data})
+                })
+            }
+        })         
+    }
 }
