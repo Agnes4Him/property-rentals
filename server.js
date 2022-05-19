@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const userRoutes = require('./src/routes/user.routes');
 const propertyRoutes = require('./src/routes/property.routes');
+const reportRoutes = require('./src/routes/report.routes')
 
 const app = express();
 const port = process.env.PORT || 7000;
@@ -17,6 +18,7 @@ app.get('/', (req, res) => {
 
 app.use(userRoutes);
 app.use(propertyRoutes);
+app.use(reportRoutes);
 
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`)
