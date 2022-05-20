@@ -147,7 +147,7 @@ class Property {
                 result({"type" : "no_ad"}, null)
                 return;
             }else {
-                db.query('UPDATE property SET status = ?, price = ?, state = ?, city = ?, address = ?, type = ?, image = ?, image_id = ? WHERE owner = ? AND image_id = ?', [property.status, property.price, property.state, property.city, property.address, property.type, property.image, property.image_id, property.owner, property.old_imageid], (err, res) => {
+                db.query('UPDATE property SET status = ?, price = ?, state = ?, city = ?, address = ?, type = ?, image = ?, image_id = ? WHERE image_id = ?', [property.status, property.price, property.state, property.city, property.address, property.type, property.image, property.image_id, old_imageid], (err, res) => {
                     if (err) {
                         console.log(err)
                         result(err, null)
