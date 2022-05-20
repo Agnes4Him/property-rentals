@@ -135,6 +135,30 @@ class Property {
             result(null, res)
         })
     }
+
+    static updateAd(old_imageid, property, result) {
+        db.query('SELECT * FROM property WHERE image_id = ? AND owner = ?', [old_imageid, property.owner], (err, res) => {
+            if (err) {
+                console.log(err)
+                result(err, null)
+                return;
+            }else if (res.length == 0) {
+                console.log("That ad does not exist")
+                result({"type" : "no_ad"}, null)
+                return;
+            }else {
+                db.query('UPDATE property SET status = ?, price = ?, state = ?, city = ?, address = ?, type = ?, image = ?, image_id = ? WHERE image_id = ?', [property.status, property.price, property.state, property.city, property.address, property.type, property.image, property.image_id, old_imageid], (err, res) => {
+                    if (err) {
+                        console.log(err)
+                        result(err, null)
+                        return;
+                    }
+                    console.log("Ad successfully updated. Ad affected: ", res.affectedRows)
+                    result(null, res.affectedRows)
+                })
+            }
+        })
+    }
 }
 
 module.exports = Property;
