@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {User, UserUpdate} = require('../models/user.model');
+const User = require('../models/user.model');
 const dotenv = require('dotenv');
 
 dotenv.config()
@@ -62,8 +62,8 @@ exports.resetPassword = (req, res) => {
             if (err) {
                 res.status(403).send({"Message": "Sign in to access resources"})
             }else {
-                //console.log(authData.user[0]['email'])
-                UserUpdate.updateUser(email, new_password, (err, data) => {
+                //console.log(authData.user['email'])
+                User.updateUser(email, new_password, (err, data) => {
                     if (err) {
                         if (err.type == "no_user") {
                             res.status(400).send({"Message" : "User does not exist"})
@@ -85,8 +85,8 @@ exports.deleteuser = (req, res) => {
         if (err) {
             res.status(403).send({"Message": "Sign in to access resources"})
         }else {
-            const id = authData.user[0]['id']
-            UserUpdate.deleteUser(id, (err, data) => {
+            const id = authData.user['id']
+            User.deleteUser(id, (err, data) => {
                 //console.log(id)
                 if (err) {
                     res.status(500).send({"Message":"Unable to delete user. Try again later"})
